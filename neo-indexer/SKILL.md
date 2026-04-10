@@ -1,4 +1,12 @@
-# Neo — Knowledge Indexer Skill
+---
+name: neo-indexer
+description: Index codebase knowledge into Neo — a persistent knowledge graph. Analyze patterns, conventions, architecture, modules, and decisions from any project, then send them to your Neo knowledge graph via MCP. Use when the user asks to index a project, save knowledge, or query project-specific context.
+metadata:
+  author: nura-labs
+  version: "1.0"
+---
+
+# Neo Knowledge Indexer
 
 You have access to a Neo MCP server that stores and serves a persistent knowledge graph. Use it to index codebase knowledge and answer questions with full project context.
 

@@ -1,49 +1,56 @@
 # Neo Skill
 
-A skill for indexing codebase knowledge into [Neo](https://neo.nura.sh) — a persistent knowledge graph for developers.
+Index codebase knowledge into [Neo](https://neo.nura.sh) — a persistent knowledge graph for developers, by [Nura Labs](https://nura.sh).
 
-## What it does
+## Install
 
-This skill teaches your AI agent how to:
-- Analyze your codebase and extract patterns, conventions, architecture, and decisions
-- Send that knowledge to your Neo knowledge graph via MCP
-- Query the graph to answer context-aware questions about your projects
+### 1. Add the Neo MCP server
 
-## Setup
-
-### 1. Create a Neo account
-
-Go to [neo.nura.sh](https://neo.nura.sh) and create an account. Copy your API token from Settings.
-
-### 2. Add the Neo MCP server
-
+**Claude Code:**
 ```bash
-# Claude Code
-claude mcp add neo https://neo.nura.sh/api/mcp --header "Authorization: Bearer YOUR_TOKEN"
-
-# Cursor — add to your MCP settings:
-# { "neo": { "url": "https://neo.nura.sh/api/mcp", "headers": { "Authorization": "Bearer YOUR_TOKEN" } } }
+claude mcp add --transport http neo https://neo.nura.sh/api/mcp
 ```
 
-### 3. Install the skill
+**Codex:**
+Add to `~/.codex/config.toml`:
+```toml
+[mcp_servers.neo]
+url = "https://neo.nura.sh/api/mcp"
+```
+
+**Cursor:**
+Add to MCP settings:
+```json
+{
+  "mcpServers": {
+    "neo": {
+      "url": "https://neo.nura.sh/api/mcp"
+    }
+  }
+}
+```
+
+On first use, your browser will open to authenticate. No API keys needed.
+
+### 2. Install the skill
 
 ```bash
 npx skills add nura-labs/neo-skill
 ```
 
-### 4. Index your first project
+### 3. Index your first project
 
-Open your project in Claude Code and say:
+Open your project and say:
 
 ```
 Index this project in Neo
 ```
 
-The AI will analyze your codebase, extract knowledge, and send it to your Neo graph.
+The AI analyzes your codebase locally, extracts patterns, conventions, and architecture, then sends the knowledge to your Neo graph.
 
-### 5. Use it
+### 4. Use it
 
-Now in any session, your AI agent has full context:
+In any session, your AI agent has full project context:
 
 ```
 How do we create a new API endpoint in this project?
@@ -55,7 +62,7 @@ What's the architecture of the auth module?
 
 1. Your AI agent analyzes the codebase **locally** (no code leaves your machine)
 2. It extracts structured knowledge: patterns, conventions, modules, architecture, decisions
-3. It sends that knowledge to Neo via MCP (only the extracted summaries, not your source code)
+3. It sends the extracted knowledge to Neo via MCP (only summaries, not source code)
 4. Neo stores it in a knowledge graph with edges between related concepts
 5. On future sessions, the AI queries Neo for project-specific context
 
