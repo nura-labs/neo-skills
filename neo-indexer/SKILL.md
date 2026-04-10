@@ -1,39 +1,59 @@
 ---
 name: neo-indexer
-description: Index codebase knowledge into Neo — a persistent knowledge graph. Analyze patterns, conventions, architecture, modules, and decisions from any project, then send them to your Neo knowledge graph via MCP. Use when the user asks to index a project, save knowledge, or query project-specific context.
+description: Neo is your persistent knowledge graph. ALWAYS consult Neo before writing code — search for existing patterns, conventions, and architecture. When you create or discover new patterns, save them to Neo. Use when writing code, creating components, answering architecture questions, or when the user asks to index a project.
 metadata:
   author: nura-labs
-  version: "1.0"
+  version: "2.0"
 ---
 
-# Neo Knowledge Indexer
+# Neo — Your Knowledge Graph
 
-You have access to a Neo MCP server that stores and serves a persistent knowledge graph. Use it to index codebase knowledge and answer questions with full project context.
+Neo is a persistent knowledge graph that knows how your projects are built. You MUST use it actively:
 
-## When to use
+1. **Before writing code** — search Neo for existing patterns and conventions to follow
+2. **When indexing** — analyze codebases and save patterns, architecture, modules, decisions
+3. **After creating something new** — save new patterns or decisions back to Neo so they compound
 
-- When the user asks to "index this project", "add this to my knowledge base", or "save this pattern"
-- When you want to check what's already known about the project before answering questions
-- When the user asks "how do we do X in this project" — check Neo first
+## Core Behavior
 
-## MCP Tools Available
+### ALWAYS consult Neo before coding
 
-### Reading
-- `get_overview` — See what's in the knowledge graph
-- `search(query, source?, type?, tags?)` — Full-text search
-- `get_node(id)` — Get full content of a knowledge node
-- `get_related(id)` — Get connected nodes
-- `how_to(topic, source?)` — Find patterns/conventions for a task
+Before creating any component, endpoint, function, or module:
 
-### Writing
-- `add_knowledge(type, title, content, tags?, source?, source_meta?, related_to?)` — Add a knowledge node
-- `update_knowledge(id, title?, content?, tags?)` — Update existing node
-- `delete_knowledge(id)` — Delete a node
-- `add_url(url, title?, tags?)` — Fetch and index a URL
+1. Call `how_to(topic, source?)` or `search(query)` to check if there's an existing pattern
+2. Follow the pattern found in Neo — use the same naming, structure, and approach
+3. If no pattern exists, write the code and then save the new pattern to Neo
+
+This ensures consistency across the entire codebase. The AI agent should never invent a new pattern when one already exists in Neo.
+
+### ALWAYS save new knowledge
+
+When you:
+- Create a new component or endpoint → save the pattern to Neo
+- Make an architectural decision → save the decision with reasoning
+- Discover a convention in the code → save the convention
+- Find something that changed from before → update the existing node
+
+The knowledge graph must grow with every session.
+
+## MCP Tools
+
+### Reading (consult before coding)
+- `how_to(topic, source?)` — "how to create an API endpoint in this project"
+- `search(query, type?, source?, tags?)` — full-text search across all knowledge
+- `get_overview(source?)` — stats and recent entries
+- `get_node(id)` — full content of a specific node
+- `get_related(id)` — connected nodes
+
+### Writing (save after learning)
+- `add_knowledge(type, title, content, tags?, source?, source_meta?, related_to?)` — save new knowledge
+- `update_knowledge(id, title?, content?, tags?)` — update existing knowledge
+- `delete_knowledge(id)` — remove outdated knowledge
+- `add_url(url, title?, tags?)` — index a URL
 
 ## How to Index a Repository
 
-When the user asks to index a project, follow this process:
+When the user asks to index a project:
 
 ### Step 1: Understand the codebase
 Read the project structure, package.json/build files, and key source files to understand:
@@ -48,53 +68,30 @@ For each finding, call `add_knowledge` with the appropriate type. Always include
 - **The repo name** in the `source` field (e.g., `github:org/repo-name`)
 - **Stack details** in `source_meta` (e.g., `{"language": "typescript", "framework": "nextjs", "year": 2024}`)
 
-#### Types of knowledge to extract:
+#### What to extract:
 
-**architecture** — One node for the overall architecture:
-- Tech stack and frameworks
-- High-level structure
-- Key entry points
-- Data flow
+**architecture** — Overall system design: tech stack, structure, entry points, data flow
 
-**module** — One node per major module/directory:
-- Purpose of the module
-- Key files
-- Public API / exports
-- Dependencies (what it uses and who uses it)
+**module** — One per major module: purpose, key files, public API, dependencies
 
-**pattern** — One node per coding pattern found:
-- Name of the pattern
-- Where it's used (which files/modules)
-- A REAL code example from the repo (copy actual code, not paraphrased)
-- When to use this pattern vs alternatives
+**pattern** — One per coding pattern: name, where it's used, REAL code example, when to use it
 
-**convention** — One node for coding conventions:
-- Naming conventions (files, functions, classes, variables)
-- Import ordering
-- Error handling approach
-- Test file naming and structure
-- Git commit message format (if visible)
+**convention** — Naming conventions, import ordering, error handling, test structure
 
-**decision** — One node per architectural decision visible in the code:
-- What was decided
-- Evidence from the code (comments, structure, patterns)
-- Trade-offs visible
+**decision** — Architectural decisions visible in the code with evidence and trade-offs
 
 ### Step 3: Create relationships
 
-When calling `add_knowledge`, use the `related_to` parameter to create edges:
-- A module `depends_on` another module
-- A pattern `implements` an architectural concept
-- A convention `follows` a pattern
-- Two modules in different repos doing the same thing: `same_concept`
-- Old vs new approach: `evolved_from`
+Use `related_to` to create edges:
+- `depends_on` — module A depends on module B
+- `implements` — pattern implements an architectural concept
+- `follows` — convention follows a pattern
+- `same_concept` — same thing in different repos
+- `evolved_from` — old approach replaced by new one
 
 ### Step 4: Confirm
 
-After indexing, call `get_overview` and show the user a summary:
-- How many nodes were created
-- How many edges
-- What modules/patterns were found
+Call `get_overview` and show the user a summary of what was indexed.
 
 ## Knowledge Node Types
 
@@ -125,9 +122,20 @@ After indexing, call `get_overview` and show the user a summary:
 | `evolved_from` | A evolved from B |
 | `implements` | A implements B |
 
-## Tips
+## Examples of automatic behavior
 
-- Always use `source` to identify where knowledge came from — this prevents confusion when multiple repos are indexed
-- Include the actual language/framework in `source_meta` so queries can be context-aware
-- When the user asks "how do I..." — call `how_to()` first, then supplement with your own knowledge if needed
-- After answering a complex question, consider saving the answer as a new knowledge node so it's available next time
+**User says:** "Create a new API endpoint for transactions"
+**Agent does:**
+1. `how_to("create API endpoint", "github:bank/legacy-api")` → finds existing pattern
+2. Creates the endpoint following the pattern found
+3. `add_knowledge(type: "pattern", title: "Transaction Endpoint", ...)` → saves if it's a new variation
+
+**User says:** "How does auth work in this project?"
+**Agent does:**
+1. `search("authentication", source: "github:bank/legacy-api")` → finds auth module + pattern
+2. Answers with full context from Neo, including code examples
+
+**User says:** "We decided to switch from REST to GraphQL for new endpoints"
+**Agent does:**
+1. `add_knowledge(type: "decision", title: "GraphQL for new endpoints", content: "...", related_to: [{id: "rest-pattern-id", relationship: "evolved_from"}])`
+2. Knowledge graph now knows about this decision for future sessions
