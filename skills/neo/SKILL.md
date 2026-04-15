@@ -22,8 +22,8 @@ Neo remembers how your projects are built. Before writing any code, check what a
 how_to("create API endpoint")          → find the pattern
 search("authentication")               → find related knowledge
 get_overview()                         → see what's indexed
-get_node(id)                           → full content + backlinks
-get_related(id)                        → connected nodes
+get_node(slug)                         → full content + backlinks
+get_related(slug)                      → connected nodes
 ```
 
 ## When the Agent Writes Code
